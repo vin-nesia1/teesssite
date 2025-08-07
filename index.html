@@ -14,22 +14,24 @@
   <button onclick="generate()">Generate</button>
   <textarea id="output" placeholder="Hasil URL akan muncul di sini"></textarea>
   <script>
-    async function generate() {
-      const url = document.getElementById('url').value;
-      const output = document.getElementById('output');
-      output.value = '⏳ Memuat...';
-      try {
-        const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-        const res = await fetch(proxy);
-        const data = await res.json();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, 'text/html');
-        const links = [...doc.querySelectorAll('a')].map(a => a.href).filter(h => h.startsWith('http'));
-        output.value = [...new Set(links)].join('\\n');
-      } catch (e) {
-        output.value = '❌ Gagal mengambil data. Pastikan URL valid dan tidak diblokir CORS.';
-      }
+  async function generate() {
+    const url = document.getElementById('url').value;
+    const output = document.getElementById('output');
+    output.value = '⏳ Mengambil halaman...';
+    try {
+      const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+      const res = await fetch(proxy);
+      const data = await res.json();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.contents, 'text/html');
+      const anchors = [...doc.querySelectorAll('a')];
+      const links = anchors.map(a => a.href).filter(h => h.startsWith('http'));
+      const unique = [...new Set(links)];
+      output.value = unique.join('\n');
+    } catch (e) {
+      output.value = '❌ Gagal mengambil data. Cek URL dan pastikan tidak diblokir CORS.';
     }
-  </script>
+  }
+</script>
 </body>
 </html>
